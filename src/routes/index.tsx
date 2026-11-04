@@ -216,7 +216,7 @@ function Index() {
                 onSelect={setDate}
                 locale={ptBR}
                 disabled={{ before: new Date() }}
-                className="pointer-events-auto p-3 text-ink-foreground [&_button[aria-selected=true]]:!bg-primary [&_button[aria-selected=true]]:!text-primary-foreground"
+                className="pointer-events-auto bg-transparent p-3 text-ink-foreground [&_.rdp-caption_label]:text-ink-foreground [&_button]:text-ink-foreground [&_button[aria-selected=true]]:!bg-primary [&_button[aria-selected=true]]:!text-primary-foreground"
               />
               <p className="px-3 pb-2 text-center text-sm font-semibold text-primary">
                 {date ? format(date, "EEEE, dd 'de' MMMM", { locale: ptBR }) : "Selecione uma data"}
