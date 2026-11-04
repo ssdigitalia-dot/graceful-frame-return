@@ -139,7 +139,7 @@
 .fx-drag { transform: translateY(calc(var(--sd) * var(--sv) * -14px)); }
 
 /* Headings tilt a hair with the scroll, a sonic doppler */
-.doppler { transform: skewX(calc(var(--sd) * var(--sv) * -0.8deg)); }
+.doppler, h2 { transform: skewX(calc(var(--sd) * var(--sv) * -0.8deg)); }
 
 /* Air streaks that fade in only while the page is in motion */
 .fx-sonic { opacity: calc(var(--sv) * 0.5); }

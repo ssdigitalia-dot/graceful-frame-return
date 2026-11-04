@@ -1,9 +1,12 @@
+// ============= Full file contents =============
+
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { ArrowUp, Mic, Headphones, SlidersHorizontal, Disc3, Lightbulb, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays } from "lucide-react";
 import logo from "@/assets/amorim-logo.png.asset.json";
 import studio from "@/assets/studio-about.jpg";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
+import { useReveal, useScrollPhysics } from "@/hooks/useScrollPhysics";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -37,10 +40,15 @@ const services = [
   { icon: Sparkles, t: "Produções especiais", d: "Projetos personalizados para eventos e marcas." },
 ];
 
+const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
+
 function Index() {
   const [showTop, setShowTop] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sent, setSent] = useState(false);
+
+  useScrollPhysics();
+  useReveal();
 
   useEffect(() => {
     const onScroll = () => {
@@ -59,6 +67,19 @@ function Index() {
 
   return (
     <div className="min-h-screen">
+      {/* Scroll progress: a line with its echo, drawn as the page moves */}
+      <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[60] h-[3px]">
+        <div className="fx-wave h-full w-full origin-left bg-gradient-primary" />
+        <div className="fx-echo absolute inset-0 origin-left bg-gradient-primary blur-[3px]" />
+      </div>
+
+      {/* Air streaks: only visible while the page is in motion */}
+      <div aria-hidden className="fx-sonic pointer-events-none fixed inset-0 z-[55] overflow-hidden">
+        {[18, 38, 58, 78].map((top) => (
+          <i key={top} className="absolute left-0 h-px w-full" style={{ top: `${top}%` }} />
+        ))}
+      </div>
+
       {/* Header */}
       <header className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${scrolled ? "bg-ink/85 backdrop-blur-md py-2" : "bg-transparent py-4"}`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5">
@@ -76,14 +97,16 @@ function Index() {
 
       {/* Hero: full-bleed media to the very top, no text over it */}
       <section id="topo" className="relative h-screen min-h-[560px] w-full overflow-hidden bg-ink">
-        <video src={heroVideo.url} poster={studio} autoPlay muted loop playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover" />
+        <video src={heroVideo.url} poster={studio} autoPlay muted loop playsInline preload="auto" className="fx-video absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-ink/25" />
-        <div aria-hidden className="absolute inset-x-0 bottom-24 flex items-end justify-center gap-1.5 opacity-70">
-          {Array.from({ length: 28 }).map((_, i) => (
-            <span key={i} className="eq-bar w-1 rounded-full bg-gradient-primary" style={{ animationDelay: `${(i * 137) % 1000}ms`, animationDuration: `${900 + ((i * 53) % 700)}ms` }} />
-          ))}
+        <div aria-hidden className="fx-parallax absolute inset-x-0 bottom-24 flex items-end justify-center">
+          <div className="fx-eq flex items-end justify-center gap-1.5">
+            {Array.from({ length: 28 }).map((_, i) => (
+              <span key={i} className="eq-bar w-1 rounded-full bg-gradient-primary" style={{ animationDelay: `${(i * 137) % 1000}ms`, animationDuration: `${900 + ((i * 53) % 700)}ms` }} />
+            ))}
+          </div>
         </div>
-        <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div aria-hidden className="fx-parallax pointer-events-none absolute inset-0">
           {["♪", "♫", "♩", "♬", "♪", "♫"].map((n, i) => (
             <span key={i} className="music-note absolute text-2xl text-primary" style={{ left: `${10 + i * 15}%`, animationDelay: `${i * 1.7}s` }}>{n}</span>
           ))}
@@ -113,8 +136,10 @@ function Index() {
       {/* Sobre */}
       <section id="sobre" className="bg-secondary py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-2">
-          <img src={studio} alt="Estúdio Amorim" loading="lazy" width={1280} height={960} className="rounded-2xl shadow-glow" />
-          <div>
+          <div data-reveal className="reveal fx-drag">
+            <img src={studio} alt="Estúdio Amorim" loading="lazy" width={1280} height={960} className="rounded-2xl shadow-glow" />
+          </div>
+          <div data-reveal className="reveal" style={delay(140)}>
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Sobre nós</p>
             <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">MUITO MAIS QUE PRODUÇÃO, UMA PAIXÃO PELA MÚSICA!</h2>
             <p className="mt-5 text-muted-foreground">
@@ -128,13 +153,13 @@ function Index() {
 
       {/* Serviços */}
       <section id="servicos" className="mx-auto max-w-6xl px-5 py-24">
-        <div className="text-center">
+        <div data-reveal className="reveal text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Serviços</p>
           <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">NOSSA PRODUÇÃO, SEU TALENTO!</h2>
         </div>
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map(({ icon: I, t, d }) => (
-            <div key={t} className="group rounded-2xl border bg-card p-7 transition-all hover:-translate-y-1 hover:border-primary hover:shadow-glow">
+          {services.map(({ icon: I, t, d }, i) => (
+            <div key={t} data-reveal className="reveal group rounded-2xl border bg-card p-7 transition-all hover:-translate-y-1 hover:border-primary hover:shadow-glow" style={delay(i * 90)}>
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground"><I className="h-6 w-6" /></div>
               <h3 className="mt-5 text-xl font-bold">{t}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{d}</p>
@@ -147,12 +172,16 @@ function Index() {
       {/* Vídeo */}
       <section id="video" className="bg-ink py-24 text-ink-foreground">
         <div className="mx-auto max-w-5xl px-5 text-center">
-          <h2 className="text-3xl font-extrabold md:text-4xl">CONHEÇA A <span className="text-gradient-primary">AMORIM!</span></h2>
-          <p className="mx-auto mt-4 max-w-2xl text-ink-foreground/70">Conheça nosso trabalho, nossa estrutura e a dedicação que colocamos em cada produção.</p>
-          <div className="relative mt-10 aspect-video overflow-hidden rounded-2xl border border-ink-foreground/10">
-            <img src={studio} alt="" loading="lazy" className="h-full w-full object-cover opacity-60" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-primary shadow-glow"><Play className="ml-1 h-9 w-9 text-primary-foreground" /></span>
+          <div data-reveal className="reveal">
+            <h2 className="text-3xl font-extrabold md:text-4xl">CONHEÇA A <span className="text-gradient-primary">AMORIM!</span></h2>
+            <p className="mx-auto mt-4 max-w-2xl text-ink-foreground/70">Conheça nosso trabalho, nossa estrutura e a dedicação que colocamos em cada produção.</p>
+          </div>
+          <div data-reveal className="reveal fx-drag" style={delay(160)}>
+            <div className="relative mt-10 aspect-video overflow-hidden rounded-2xl border border-ink-foreground/10">
+              <img src={studio} alt="" loading="lazy" className="h-full w-full object-cover opacity-60" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-primary shadow-glow"><Play className="ml-1 h-9 w-9 text-primary-foreground" /></span>
+              </div>
             </div>
           </div>
           <a href="#video" className="mt-8 inline-block rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow">ASSISTA AO VÍDEO</a>
@@ -161,7 +190,7 @@ function Index() {
 
       {/* Agenda */}
       <section id="agenda" className="mx-auto max-w-3xl px-5 py-24">
-        <div className="text-center">
+        <div data-reveal className="reveal text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Agenda</p>
           <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">SEU PRÓXIMO PROJETO COMEÇA AQUI!</h2>
         </div>
@@ -171,7 +200,7 @@ function Index() {
             <p className="mt-2 text-muted-foreground">Obrigado! Vamos analisar a disponibilidade e entraremos em contato para confirmar sua data.</p>
           </div>
         ) : (
-          <form onSubmit={submit} className="mt-10 grid gap-4 rounded-2xl border bg-card p-7 sm:grid-cols-2">
+          <form onSubmit={submit} data-reveal className="reveal mt-10 grid gap-4 rounded-2xl border bg-card p-7 sm:grid-cols-2" style={delay(120)}>
             <input required placeholder="Nome" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring" />
             <input required placeholder="Telefone / WhatsApp" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring" />
             <select required defaultValue="" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring sm:col-span-2">
@@ -189,10 +218,10 @@ function Index() {
       {/* Galeria */}
       <section id="galeria" className="bg-secondary py-24">
         <div className="mx-auto max-w-6xl px-5">
-          <h2 className="text-center text-3xl font-extrabold md:text-4xl">BASTIDORES E RESULTADOS</h2>
+          <h2 data-reveal className="reveal text-center text-3xl font-extrabold md:text-4xl">BASTIDORES E RESULTADOS</h2>
           <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className={`overflow-hidden rounded-2xl ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`}>
+              <div key={i} data-reveal className={`reveal ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`} style={delay(i * 80)}>
                 <img src={studio} alt="Bastidores" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
               </div>
             ))}
@@ -202,24 +231,24 @@ function Index() {
 
       {/* Contato */}
       <section id="contato" className="mx-auto max-w-4xl px-5 py-24 text-center">
-        <h2 className="text-3xl font-extrabold md:text-4xl">VAMOS PRODUZIR ALGO <span className="text-gradient-primary">INCRÍVEL?</span></h2>
+        <h2 data-reveal className="reveal text-3xl font-extrabold md:text-4xl">VAMOS PRODUZIR ALGO <span className="text-gradient-primary">INCRÍVEL?</span></h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {[[MessageCircle, "WhatsApp", "(00) 00000-0000"], [Phone, "Telefone", "(00) 0000-0000"], [Mail, "E-mail", "contato@amorim.com.br"], [Instagram, "Instagram", "@amorimproducoes"]].map(([I, l, v]) => {
+          {[[MessageCircle, "WhatsApp", "(00) 00000-0000"], [Phone, "Telefone", "(00) 0000-0000"], [Mail, "E-mail", "contato@amorim.com.br"], [Instagram, "Instagram", "@amorimproducoes"]].map(([I, l, v], i) => {
             const Icon = I as typeof Phone;
             return (
-              <div key={l as string} className="flex items-center gap-4 rounded-2xl border bg-card p-5 text-left">
+              <div key={l as string} data-reveal className="reveal flex items-center gap-4 rounded-2xl border bg-card p-5 text-left" style={delay(i * 80)}>
                 <Icon className="h-6 w-6 text-primary" />
                 <div><p className="text-xs font-bold uppercase text-muted-foreground">{l as string}</p><p className="font-semibold">{v as string}</p></div>
               </div>
             );
           })}
         </div>
-        <a href="#agenda" className="mt-10 inline-block rounded-full bg-gradient-primary px-8 py-4 font-bold text-primary-foreground shadow-glow">FALE COM A AMORIM</a>
+        <a href="#agenda" data-reveal className="reveal mt-10 inline-block rounded-full bg-gradient-primary px-8 py-4 font-bold text-primary-foreground shadow-glow" style={delay(200)}>FALE COM A AMORIM</a>
       </section>
 
       {/* Footer */}
       <footer className="bg-ink py-14 text-ink-foreground">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-5 text-center">
+        <div data-reveal className="reveal mx-auto flex max-w-6xl flex-col items-center gap-6 px-5 text-center">
           <img src={logo.url} alt="Amorim Consultoria e Produções" loading="lazy" className="h-28 w-auto" />
           <p className="font-display font-bold tracking-wide">AMORIM CONSULTORIA E PRODUÇÕES</p>
           <nav className="flex flex-wrap justify-center gap-5 text-sm text-ink-foreground/70">
