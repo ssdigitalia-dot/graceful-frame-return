@@ -38,6 +38,11 @@
 
 :root {
   --radius: 0.75rem;
+  /* scroll physics: progress 0-1, velocity 0-1, direction, scroll offset px */
+  --sp: 0;
+  --sv: 0;
+  --sd: 1;
+  --sy: 0;
   --background: oklch(0.99 0.003 60);
   --foreground: oklch(0.2 0 0);
   --card: oklch(1 0 0);
@@ -110,3 +115,61 @@
   100% { transform: translateY(-70vh) rotate(25deg); opacity: 0; }
 }
 @utility music-note { bottom: 8%; opacity: 0; animation: float-note 10s linear infinite; }
+
+/* ===== Scroll physics: motion that follows the speed of the scroll ===== */
+
+/* Video breathes with speed: zooms, drifts with direction, softens like a passing wave */
+.fx-video {
+  transform: scale(calc(1 + var(--sv) * 0.05)) translateY(calc(var(--sd) * var(--sv) * 12px));
+  filter: blur(calc(var(--sv) * 1.4px)) saturate(calc(1 + var(--sv) * 0.22));
+  will-change: transform, filter;
+}
+
+/* Sound bars grow taller and brighter the faster the page moves */
+.fx-eq {
+  transform-origin: bottom center;
+  transform: scaleY(calc(1 + var(--sv) * 1.6));
+  opacity: calc(0.55 + var(--sv) * 0.45);
+}
+
+/* Notes and bars lag behind slightly, like a wave catching up */
+.fx-parallax { transform: translateY(calc(var(--sy) * 0.12px)); }
+
+/* Light drag on content while scrolling fast, up or down */
+.fx-drag { transform: translateY(calc(var(--sd) * var(--sv) * -14px)); }
+
+/* Headings tilt a hair with the scroll, a sonic doppler */
+.doppler, h2 { transform: skewX(calc(var(--sd) * var(--sv) * -0.8deg)); }
+
+/* Air streaks that fade in only while the page is in motion */
+.fx-sonic { opacity: calc(var(--sv) * 0.5); }
+.fx-sonic i {
+  transform: translateY(calc(var(--sd) * var(--sv) * 60px)) scaleY(calc(0.5 + var(--sv) * 1.2));
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary) 70%, transparent), transparent);
+}
+
+/* Progress line + its echo, drawn as the page scrolls */
+.fx-wave { transform: scaleX(var(--sp)); }
+.fx-echo { transform: scaleX(var(--sp)); opacity: calc(var(--sv) * 0.6); }
+
+/* Section reveals: armed only once JS runs, so nothing hides without it */
+html.reveal-armed .reveal {
+  opacity: 0;
+  transform: translateY(calc(var(--dir, 1) * 34px)) scale(0.994);
+  transition:
+    opacity 0.85s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.95s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: var(--d, 0ms);
+  will-change: opacity, transform;
+}
+html.reveal-armed .reveal.is-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .fx-video, .fx-eq, .fx-drag, .fx-parallax, .doppler { transform: none; filter: none; }
+  .fx-eq, .fx-sonic { opacity: 1; }
+  .fx-sonic, .fx-wave, .fx-echo { display: none; }
+  html.reveal-armed .reveal { opacity: 1; transform: none; transition: none; }
+  .eq-bar, .music-note { animation: none; }
+}
+
