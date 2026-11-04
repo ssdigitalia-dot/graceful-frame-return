@@ -145,3 +145,7 @@ html.reveal-armed .reveal.is-in { opacity: 1; transform: none; }
   .eq-bar, .music-note { animation: none; }
 }
 
+
+#lovable-badge {
+  display: none !important;
+}
