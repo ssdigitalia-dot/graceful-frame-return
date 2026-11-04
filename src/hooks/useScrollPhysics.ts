@@ -3,7 +3,7 @@ import { useEffect } from "react";
 // Fastest scroll (px per frame) treated as "full speed" for the sound-envelope math.
 const MAX_V = 52;
 
-function writeVars(root: HTMLElement, y: number, smooth: number, dir: number) {
+function writeVars(root: HTMLElement, cache: Record<string, string>, y: number, smooth: number, dir: number) {
   const max = Math.max(1, root.scrollHeight - window.innerHeight);
   const next: Record<string, string> = {
     "--sp": (Math.min(1, Math.max(0, y / max))).toFixed(3),
@@ -12,8 +12,8 @@ function writeVars(root: HTMLElement, y: number, smooth: number, dir: number) {
     "--sy": Math.round(y).toString(),
   };
   for (const [k, v] of Object.entries(next)) {
-    if (root.dataset[k] !== v) {
-      root.dataset[k] = v;
+    if (cache[k] !== v) {
+      cache[k] = v;
       root.style.setProperty(k, v);
     }
   }
