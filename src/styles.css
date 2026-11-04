@@ -38,6 +38,11 @@
 
 :root {
   --radius: 0.75rem;
+  /* scroll physics: progress 0-1, velocity 0-1, direction, scroll offset px */
+  --sp: 0;
+  --sv: 0;
+  --sd: 1;
+  --sy: 0;
   --background: oklch(0.99 0.003 60);
   --foreground: oklch(0.2 0 0);
   --card: oklch(1 0 0);
