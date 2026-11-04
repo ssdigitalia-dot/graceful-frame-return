@@ -7,6 +7,9 @@ import logo from "@/assets/amorim-logo.png.asset.json";
 import studio from "@/assets/studio-about.jpg";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { useReveal, useScrollPhysics } from "@/hooks/useScrollPhysics";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -46,6 +49,8 @@ function Index() {
   const [showTop, setShowTop] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sent, setSent] = useState(false);
+  const [date, setDate] = useState<Date | undefined>();
+  const field = "rounded-lg border border-ink-foreground/15 bg-ink-foreground/5 px-4 py-3 text-ink-foreground placeholder:text-ink-foreground/50 outline-none focus:border-primary";
 
   useScrollPhysics();
   useReveal();
@@ -189,30 +194,53 @@ function Index() {
       </section>
 
       {/* Agenda */}
-      <section id="agenda" className="mx-auto max-w-3xl px-5 py-24">
+      <section id="agenda" className="relative overflow-hidden bg-ink py-24 text-ink-foreground">
+        <div className="pointer-events-none absolute -top-40 left-1/2 h-96 w-[48rem] -translate-x-1/2 rounded-full bg-primary/25 blur-3xl" />
+        <div className="relative mx-auto max-w-5xl px-5">
         <div data-reveal className="reveal text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Agenda</p>
-          <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">SEU PRÓXIMO PROJETO COMEÇA AQUI!</h2>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">SEU PRÓXIMO PROJETO <span className="text-gradient-primary">COMEÇA AQUI!</span></h2>
+          <p className="mt-3 text-ink-foreground/70">Escolha a data no calendário e envie sua solicitação.</p>
         </div>
         {sent ? (
-          <div className="mt-10 rounded-2xl border border-primary bg-accent p-8 text-center">
-            <h3 className="text-xl font-bold text-accent-foreground">Solicitação recebida!</h3>
-            <p className="mt-2 text-muted-foreground">Obrigado! Vamos analisar a disponibilidade e entraremos em contato para confirmar sua data.</p>
+          <div className="mt-10 rounded-2xl border border-primary bg-ink-foreground/5 p-8 text-center">
+            <h3 className="text-xl font-bold text-primary">Solicitação recebida!</h3>
+            <p className="mt-2 text-ink-foreground/70">Obrigado! Vamos analisar a disponibilidade para {date ? format(date, "dd 'de' MMMM", { locale: ptBR }) : "sua data"} e entraremos em contato.</p>
           </div>
         ) : (
-          <form onSubmit={submit} data-reveal className="reveal mt-10 grid gap-4 rounded-2xl border bg-card p-7 sm:grid-cols-2" style={delay(120)}>
-            <input required placeholder="Nome" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring" />
-            <input required placeholder="Telefone / WhatsApp" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring" />
-            <select required defaultValue="" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring sm:col-span-2">
-              <option value="" disabled>Serviço desejado</option>
-              {services.map((s) => <option key={s.t}>{s.t}</option>)}
-            </select>
-            <input required type="date" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring" />
-            <input required type="time" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring" />
-            <textarea rows={4} placeholder="Descreva seu projeto" className="rounded-lg border border-input bg-background px-4 py-3 outline-none focus:border-ring sm:col-span-2" />
-            <button className="rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow sm:col-span-2">SOLICITAR AGENDAMENTO</button>
+          <form onSubmit={(e) => { if (!date) { e.preventDefault(); return; } submit(e); }} data-reveal className="reveal mt-12 grid gap-8 rounded-3xl border border-primary/40 bg-ink-foreground/5 p-6 shadow-glow md:grid-cols-[auto_1fr] md:p-8" style={delay(120)}>
+            <div className="mx-auto rounded-2xl border border-ink-foreground/10 bg-ink p-2">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                locale={ptBR}
+                disabled={{ before: new Date() }}
+                className="pointer-events-auto bg-transparent p-3 text-ink-foreground [&_.rdp-caption_label]:text-ink-foreground [&_button]:text-ink-foreground [&_.rdp-today_button]:!text-primary-foreground [&_.rdp-today_button]:!bg-primary/60 [&_button[aria-selected=true]]:!bg-primary [&_button[aria-selected=true]]:!text-primary-foreground"
+              />
+              <p className="px-3 pb-2 text-center text-sm font-semibold text-primary">
+                {date ? format(date, "EEEE, dd 'de' MMMM", { locale: ptBR }) : "Selecione uma data"}
+              </p>
+            </div>
+            <div className="grid content-start gap-4 sm:grid-cols-2">
+              <input required placeholder="Nome" className={field} />
+              <input required placeholder="Telefone / WhatsApp" className={field} />
+              <select required defaultValue="" className={`${field} sm:col-span-2`}>
+                <option value="" disabled>Serviço desejado</option>
+                {services.map((s) => <option key={s.t} className="text-foreground">{s.t}</option>)}
+              </select>
+              <select required defaultValue="" className={`${field} sm:col-span-2`}>
+                <option value="" disabled>Horário</option>
+                {["09:00", "11:00", "14:00", "16:00", "19:00"].map((h) => <option key={h} className="text-foreground">{h}</option>)}
+              </select>
+              <textarea rows={4} placeholder="Descreva seu projeto" className={`${field} sm:col-span-2`} />
+              <button disabled={!date} className="rounded-full bg-gradient-primary px-7 py-4 font-bold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-50 sm:col-span-2">
+                {date ? "SOLICITAR AGENDAMENTO" : "ESCOLHA UMA DATA NO CALENDÁRIO"}
+              </button>
+            </div>
           </form>
         )}
+        </div>
       </section>
 
       {/* Galeria */}
