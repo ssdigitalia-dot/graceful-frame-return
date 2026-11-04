@@ -35,6 +35,7 @@ export function useScrollPhysics() {
     let last = window.scrollY;
     let smooth = 0;
     let dir = 1;
+    const cache: Record<string, string> = {};
 
     const tick = () => {
       const y = window.scrollY;
@@ -45,11 +46,11 @@ export function useScrollPhysics() {
       // Sound envelope: quick attack while scrolling, slow release when it stops.
       smooth = target > smooth ? smooth + (target - smooth) * 0.55 : smooth * 0.88;
       if (smooth < 0.002) smooth = 0;
-      writeVars(root, y, smooth, dir);
+      writeVars(root, cache, y, smooth, dir);
       raf = requestAnimationFrame(tick);
     };
 
-    writeVars(root, window.scrollY, 0, dir);
+    writeVars(root, cache, window.scrollY, 0, dir);
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
