@@ -2,9 +2,11 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { ArrowUp, Mic, Headphones, SlidersHorizontal, Disc3, Lightbulb, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays } from "lucide-react";
+import { ArrowUp, Mic, Speaker, Ticket, Users, Building2, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays, MapPin } from "lucide-react";
 import logo from "@/assets/amorim-logo.png.asset.json";
-import studio from "@/assets/studio-about.jpg";
+import palcoShow from "@/assets/palco-show.jpg";
+import publicoShow from "@/assets/publico-show.jpg";
+import palcoTeatro from "@/assets/palco-teatro.jpg";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { useReveal, useScrollPhysics } from "@/hooks/useScrollPhysics";
 import { Calendar } from "@/components/ui/calendar";
@@ -15,9 +17,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Amorim Consultoria e Produções — Sua ideia, nossa produção!" },
-      { name: "description", content: "Produção musical, gravação, edição, mixagem e masterização com qualidade e paixão pela música." },
+      { name: "description", content: "Produção de shows em São Paulo: palco, som, iluminação, bilheteria e agenda de datas em Sescs, teatros e casas de show." },
       { property: "og:title", content: "Amorim Consultoria e Produções" },
-      { property: "og:description", content: "Sua ideia, nossa produção! Agende sua data de gravação." },
+      { property: "og:description", content: "Sua ideia, nossa produção! Agende a data do seu show." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -28,6 +30,7 @@ export const Route = createFileRoute("/")({
 const nav = [
   ["Sobre", "#sobre"],
   ["Serviços", "#servicos"],
+  ["Palcos", "#palcos"],
   ["Vídeo", "#video"],
   ["Agenda", "#agenda"],
   ["Galeria", "#galeria"],
@@ -35,13 +38,28 @@ const nav = [
 ];
 
 const services = [
-  { icon: Disc3, t: "Produção musical", d: "Do arranjo ao resultado final, com identidade e qualidade." },
-  { icon: Mic, t: "Gravação de áudio", d: "Voz e instrumentos captados com equipamentos profissionais." },
-  { icon: SlidersHorizontal, t: "Edição e mixagem", d: "Equilíbrio, clareza e impacto em cada faixa." },
-  { icon: Headphones, t: "Masterização", d: "Sua música pronta para todas as plataformas." },
-  { icon: Lightbulb, t: "Consultoria musical", d: "Orientação para carreira, projetos e lançamentos." },
-  { icon: Sparkles, t: "Produções especiais", d: "Projetos personalizados para eventos e marcas." },
+  { icon: Speaker, t: "Produção de shows", d: "Do planejamento à noite do evento, com equipe e estrutura completas." },
+  { icon: Mic, t: "Palco, som e iluminação", d: "Montagem profissional sob medida para cada casa e cada espetáculo." },
+  { icon: Building2, t: "Booking de casas e teatros", d: "Buscamos datas em Sescs, teatros e casas de show de São Paulo." },
+  { icon: Ticket, t: "Bilheteria e divulgação", d: "Ingressos, divulgação e gestão do público antes, durante e depois." },
+  { icon: Users, t: "Produção executiva", d: "Contratos, logística, cronograma e equipe — sem improviso." },
+  { icon: Sparkles, t: "Shows personalizados", d: "Espetáculos criados para festivais, marcas e eventos privados." },
 ];
+
+const venues = [
+  "Sesc Pompeia",
+  "Sesc Consolação",
+  "Sesc Pinheiros",
+  "Sesc 24 de Maio",
+  "Sesc Bom Retiro",
+  "Sesc Interlagos",
+  "Sesc Santo André",
+  "Sesc Osasco",
+  "Teatros e casas de show em SP",
+  "Festivais e eventos corporativos",
+];
+
+const gallery = [publicoShow, palcoShow, palcoTeatro, palcoShow, palcoTeatro, publicoShow];
 
 const delay = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
 
@@ -51,6 +69,7 @@ function Index() {
   const [sent, setSent] = useState(false);
   const [date, setDate] = useState<Date | undefined>();
   const [heroReady, setHeroReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const heroRef = useRef<HTMLVideoElement>(null);
   const field = "rounded-lg border border-ink-foreground/15 bg-ink-foreground/5 px-4 py-3 text-ink-foreground placeholder:text-ink-foreground/50 outline-none focus:border-primary";
 
@@ -112,7 +131,7 @@ function Index() {
           <a href="#topo" aria-label="Início">
             <img src={logo.url} alt="Amorim Consultoria e Produções" className={`w-auto transition-all duration-500 ${scrolled ? "h-12" : "h-16 md:h-20"}`} />
           </a>
-          <nav className="hidden items-center gap-7 md:flex">
+          <nav className="hidden items-center gap-6 md:flex">
             {nav.map(([l, h]) => (
               <a key={h} href={h} className="text-sm font-semibold text-ink-foreground/85 transition-colors hover:text-primary">{l}</a>
             ))}
@@ -159,11 +178,11 @@ function Index() {
           SUA IDEIA, <span className="text-gradient-primary">NOSSA PRODUÇÃO!</span>
         </h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-          Transformamos talento, criatividade e boas ideias em experiências musicais de qualidade.
+          Transformamos talento, criatividade e boas ideias em noites inesquecíveis — do primeiro encontro até a luz do palco.
         </p>
         <div className="mt-9 flex flex-wrap justify-center gap-4">
           <a href="#agenda" className="inline-flex items-center gap-2 rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5">
-            <CalendarDays className="h-5 w-5" /> AGENDE SUA DATA
+            <CalendarDays className="h-5 w-5" /> AGENDE SEU SHOW
           </a>
           <a href="#video" className="inline-flex items-center gap-2 rounded-full border-2 border-foreground px-7 py-3.5 font-bold transition-colors hover:bg-foreground hover:text-background">
             <Play className="h-5 w-5" /> ASSISTA AO NOSSO VÍDEO
@@ -175,16 +194,16 @@ function Index() {
       <section id="sobre" className="bg-secondary py-24">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 md:grid-cols-2">
           <div data-reveal className="reveal fx-drag">
-            <img src={studio} alt="Estúdio Amorim" loading="lazy" width={1280} height={960} className="rounded-2xl shadow-glow" />
+            <img src={palcoShow} alt="Banda em palco durante show produzido pela Amorim" loading="lazy" width={1280} height={864} className="rounded-2xl shadow-glow" />
           </div>
           <div data-reveal className="reveal" style={delay(140)}>
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Sobre nós</p>
-            <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">MUITO MAIS QUE PRODUÇÃO, UMA PAIXÃO PELA MÚSICA!</h2>
+            <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">MUITO MAIS QUE PRODUÇÃO, UMA PAIXÃO PELO PALCO!</h2>
             <p className="mt-5 text-muted-foreground">
-              A Amorim Consultoria e Produções nasceu para dar vida a projetos musicais com qualidade, criatividade e excelência.
-              Cada artista recebe atenção próxima, do primeiro contato à entrega final.
+              A Amorim Consultoria e Produções existe para tirar shows do papel. Cuidamos de data, casa, equipe, estrutura e público,
+              para que o artista se preocupe apenas em brilhar quando a luz acender.
             </p>
-            <p className="mt-4 text-muted-foreground">Confiança, profissionalismo e cuidado em cada detalhe sonoro.</p>
+            <p className="mt-4 text-muted-foreground">Confiança, profissionalismo e cuidado em cada detalhe da noite.</p>
           </div>
         </div>
       </section>
@@ -193,7 +212,7 @@ function Index() {
       <section id="servicos" className="mx-auto max-w-6xl px-5 py-24">
         <div data-reveal className="reveal text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Serviços</p>
-          <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">NOSSA PRODUÇÃO, SEU TALENTO!</h2>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">NOSSA PRODUÇÃO, SEU SHOW!</h2>
         </div>
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {services.map(({ icon: I, t, d }, i) => (
@@ -207,22 +226,52 @@ function Index() {
         </div>
       </section>
 
+      {/* Palcos */}
+      <section id="palcos" className="bg-secondary py-24">
+        <div className="mx-auto max-w-6xl px-5">
+          <div data-reveal className="reveal text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Palcos</p>
+            <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">A GENTE LEVA SEU SHOW AOS PALCOS MAIS PEDIDOS DE SÃO PAULO</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+              Trabalhamos com a agenda dos espaços mais disputados da cidade — com destaque para as unidades do Sesc — e para teatros,
+              casas de show e festivais.
+            </p>
+          </div>
+          <ul className="mt-12 flex flex-wrap justify-center gap-3">
+            {venues.map((v, i) => (
+              <li key={v} data-reveal className="reveal flex items-center gap-2 rounded-full border bg-card px-5 py-3 text-sm font-semibold transition-colors hover:border-primary" style={delay(i * 70)}>
+                <MapPin className="h-4 w-4 text-primary" /> {v}
+              </li>
+            ))}
+          </ul>
+          <div data-reveal className="reveal mt-10 text-center" style={delay(200)}>
+            <a href="#agenda" className="inline-block rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow">CONSULTAR DISPONIBILIDADE DE DATA</a>
+          </div>
+        </div>
+      </section>
+
       {/* Vídeo */}
       <section id="video" className="bg-ink py-24 text-ink-foreground">
         <div className="mx-auto max-w-5xl px-5 text-center">
           <div data-reveal className="reveal">
             <h2 className="text-3xl font-extrabold md:text-4xl">CONHEÇA A <span className="text-gradient-primary">AMORIM!</span></h2>
-            <p className="mx-auto mt-4 max-w-2xl text-ink-foreground/70">Conheça nosso trabalho, nossa estrutura e a dedicação que colocamos em cada produção.</p>
+            <p className="mx-auto mt-4 max-w-2xl text-ink-foreground/70">Conheça nosso trabalho, nossa estrutura e a dedicação que colocamos em cada espetáculo.</p>
           </div>
           <div data-reveal className="reveal fx-drag" style={delay(160)}>
-            <div className="relative mt-10 aspect-video overflow-hidden rounded-2xl border border-ink-foreground/10">
-              <img src={studio} alt="" loading="lazy" className="h-full w-full object-cover opacity-60" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-primary shadow-glow"><Play className="ml-1 h-9 w-9 text-primary-foreground" /></span>
-              </div>
+            <div className="relative mt-10 aspect-video overflow-hidden rounded-2xl border border-ink-foreground/10 bg-ink">
+              {playing ? (
+                <video src={heroVideo.url} controls autoPlay playsInline className="h-full w-full object-cover" />
+              ) : (
+                <>
+                  <img src={palcoTeatro} alt="" loading="lazy" width={1280} height={864} className="h-full w-full object-cover opacity-60" />
+                  <button type="button" onClick={() => setPlaying(true)} aria-label="Assistir ao vídeo institucional" className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-primary shadow-glow"><Play className="ml-1 h-9 w-9 text-primary-foreground" /></span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
-          <a href="#video" className="mt-8 inline-block rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow">ASSISTA AO VÍDEO</a>
+          <button type="button" onClick={() => setPlaying(true)} className="mt-8 inline-block rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow">ASSISTA AO VÍDEO</button>
         </div>
       </section>
 
@@ -232,7 +281,7 @@ function Index() {
         <div className="relative mx-auto max-w-5xl px-5">
         <div data-reveal className="reveal text-center">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Agenda</p>
-          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">SEU PRÓXIMO PROJETO <span className="text-gradient-primary">COMEÇA AQUI!</span></h2>
+          <h2 className="mt-3 text-3xl font-extrabold md:text-5xl">SEU PRÓXIMO SHOW <span className="text-gradient-primary">COMEÇA AQUI!</span></h2>
           <p className="mt-3 text-ink-foreground/70">Escolha a data no calendário e envie sua solicitação.</p>
         </div>
         {sent ? (
@@ -259,14 +308,19 @@ function Index() {
               <input required placeholder="Nome" className={field} />
               <input required placeholder="Telefone / WhatsApp" className={field} />
               <select required defaultValue="" className={`${field} sm:col-span-2`}>
-                <option value="" disabled>Serviço desejado</option>
+                <option value="" disabled>Tipo de produção</option>
                 {services.map((s) => <option key={s.t} className="text-foreground">{s.t}</option>)}
               </select>
               <select required defaultValue="" className={`${field} sm:col-span-2`}>
-                <option value="" disabled>Horário</option>
-                {["09:00", "11:00", "14:00", "16:00", "19:00"].map((h) => <option key={h} className="text-foreground">{h}</option>)}
+                <option value="" disabled>Local desejado</option>
+                {venues.map((v) => <option key={v} className="text-foreground">{v}</option>)}
+                <option className="text-foreground">Outro local</option>
               </select>
-              <textarea rows={4} placeholder="Descreva seu projeto" className={`${field} sm:col-span-2`} />
+              <select required defaultValue="" className={`${field} sm:col-span-2`}>
+                <option value="" disabled>Horário</option>
+                {["09:00", "11:00", "14:00", "16:00", "19:00", "21:00"].map((h) => <option key={h} className="text-foreground">{h}</option>)}
+              </select>
+              <textarea rows={4} placeholder="Conte sobre o seu show" className={`${field} sm:col-span-2`} />
               <button disabled={!date} className="rounded-full bg-gradient-primary px-7 py-4 font-bold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-50 sm:col-span-2">
                 {date ? "SOLICITAR AGENDAMENTO" : "ESCOLHA UMA DATA NO CALENDÁRIO"}
               </button>
@@ -279,11 +333,11 @@ function Index() {
       {/* Galeria */}
       <section id="galeria" className="bg-secondary py-24">
         <div className="mx-auto max-w-6xl px-5">
-          <h2 data-reveal className="reveal text-center text-3xl font-extrabold md:text-4xl">BASTIDORES E RESULTADOS</h2>
+          <h2 data-reveal className="reveal text-center text-3xl font-extrabold md:text-4xl">NOSSOS PALCOS, NOSSO PÚBLICO</h2>
           <div className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
+            {gallery.map((img, i) => (
               <div key={i} data-reveal className={`reveal ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`} style={delay(i * 80)}>
-                <img src={studio} alt="Bastidores" loading="lazy" className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
+                <img src={img} alt="Show produzido pela Amorim" loading="lazy" width={1280} height={864} className="h-full w-full object-cover transition-transform duration-700 hover:scale-105" />
               </div>
             ))}
           </div>
@@ -292,7 +346,7 @@ function Index() {
 
       {/* Contato */}
       <section id="contato" className="mx-auto max-w-4xl px-5 py-24 text-center">
-        <h2 data-reveal className="reveal text-3xl font-extrabold md:text-4xl">VAMOS PRODUZIR ALGO <span className="text-gradient-primary">INCRÍVEL?</span></h2>
+        <h2 data-reveal className="reveal text-3xl font-extrabold md:text-4xl">VAMOS SUBIR NESSE <span className="text-gradient-primary">PALCO JUNTOS?</span></h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {[[MessageCircle, "WhatsApp", "(00) 00000-0000"], [Phone, "Telefone", "(00) 0000-0000"], [Mail, "E-mail", "contato@amorim.com.br"], [Instagram, "Instagram", "@amorimproducoes"]].map(([I, l, v], i) => {
             const Icon = I as typeof Phone;
