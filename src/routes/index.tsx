@@ -1,7 +1,7 @@
 // ============= Full file contents =============
 
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { ArrowUp, Mic, Headphones, SlidersHorizontal, Disc3, Lightbulb, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays } from "lucide-react";
 import logo from "@/assets/amorim-logo.png.asset.json";
 import studio from "@/assets/studio-about.jpg";
@@ -50,10 +50,31 @@ function Index() {
   const [scrolled, setScrolled] = useState(false);
   const [sent, setSent] = useState(false);
   const [date, setDate] = useState<Date | undefined>();
+  const [heroReady, setHeroReady] = useState(false);
+  const heroRef = useRef<HTMLVideoElement>(null);
   const field = "rounded-lg border border-ink-foreground/15 bg-ink-foreground/5 px-4 py-3 text-ink-foreground placeholder:text-ink-foreground/50 outline-none focus:border-primary";
 
   useScrollPhysics();
   useReveal();
+
+  // Make sure the hero video really starts (muted autoplay), and only reveal it once a frame is painted.
+  useEffect(() => {
+    const v = heroRef.current;
+    if (!v) return;
+    v.muted = true;
+    const start = v.play();
+    if (start && typeof start.catch === "function") start.catch(() => {});
+    const done = () => setHeroReady(true);
+    if (v.readyState >= 2) done();
+    else {
+      v.addEventListener("loadeddata", done, { once: true });
+      v.addEventListener("playing", done, { once: true });
+    }
+    return () => {
+      v.removeEventListener("loadeddata", done);
+      v.removeEventListener("playing", done);
+    };
+  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -102,7 +123,19 @@ function Index() {
 
       {/* Hero: full-bleed media to the very top, no text over it */}
       <section id="topo" className="relative h-screen min-h-[560px] w-full overflow-hidden bg-ink">
-        <video src={heroVideo.url} poster={studio} autoPlay muted loop playsInline preload="auto" className="fx-video absolute inset-0 h-full w-full object-cover" />
+        <video
+          ref={heroRef}
+          src={heroVideo.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+          onCanPlay={() => setHeroReady(true)}
+          onPlaying={() => setHeroReady(true)}
+          className={`fx-video absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${heroReady ? "opacity-100" : "opacity-0"}`}
+        />
         <div className="absolute inset-0 bg-ink/25" />
         <div aria-hidden className="fx-parallax absolute inset-x-0 bottom-24 flex items-end justify-center">
           <div className="fx-eq flex items-end justify-center gap-1.5">
