@@ -390,14 +390,18 @@ function Index() {
 
       {/* Footer */}
       <footer className="bg-ink py-14 text-ink-foreground">
-        <div data-reveal className="reveal mx-auto flex max-w-6xl flex-col items-center gap-6 px-5 text-center">
-          <img src={logo.url} alt="Amorim Consultoria e Produções" loading="lazy" className="h-28 w-auto" />
-          <p className="font-display font-bold tracking-wide">AMORIM CONSULTORIA E PRODUÇÕES</p>
-          <nav className="flex flex-wrap justify-center gap-5 text-sm text-ink-foreground/70">
-            {nav.map(([l, h]) => <a key={h} href={h} className="hover:text-primary">{l}</a>)}
-            <a href="#" className="hover:text-primary">Política de Privacidade</a>
-          </nav>
-          <p className="text-xs text-ink-foreground/50">© {new Date().getFullYear()} Amorim Consultoria e Produções. Todos os direitos reservados.</p>
+        <div data-reveal className="reveal mx-auto grid max-w-6xl items-center gap-8 px-5 md:grid-cols-2">
+          <div className="flex justify-center md:justify-start">
+            <img src={logo.url} alt="Amorim Consultoria e Produções" loading="lazy" className="h-24 w-auto" />
+          </div>
+          <div className="flex flex-col items-center gap-4 text-center md:items-end md:text-right">
+            <p className="font-display font-bold tracking-wide">AMORIM CONSULTORIA E PRODUÇÕES</p>
+            <nav className="flex flex-wrap justify-center gap-5 text-sm text-ink-foreground/70 md:justify-end">
+              {nav.map(([l, h]) => <a key={h} href={h} className="hover:text-primary">{l}</a>)}
+              <a href="#" className="hover:text-primary">Política de Privacidade</a>
+            </nav>
+            <p className="text-xs text-ink-foreground/50">© {new Date().getFullYear()} Amorim Consultoria e Produções. Todos os direitos reservados.</p>
+          </div>
         </div>
       </footer>
 
