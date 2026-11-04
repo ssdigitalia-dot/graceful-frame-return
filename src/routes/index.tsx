@@ -69,8 +69,9 @@ function Index() {
   const [sent, setSent] = useState(false);
   const [date, setDate] = useState<Date | undefined>();
   const [heroReady, setHeroReady] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(true);
   const heroRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLVideoElement>(null);
   const field = "rounded-lg border border-ink-foreground/15 bg-ink-foreground/5 px-4 py-3 text-ink-foreground placeholder:text-ink-foreground/50 outline-none focus:border-primary";
 
   useScrollPhysics();
@@ -94,6 +95,19 @@ function Index() {
       v.removeEventListener("playing", done);
     };
   }, []);
+
+  // The video in the Vídeo section follows the play/pause state.
+  useEffect(() => {
+    const v = sectionRef.current;
+    if (!v) return;
+    v.muted = true;
+    if (playing) {
+      const start = v.play();
+      if (start && typeof start.catch === "function") start.catch(() => {});
+    } else {
+      v.pause();
+    }
+  }, [playing]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -258,20 +272,33 @@ function Index() {
             <p className="mx-auto mt-4 max-w-2xl text-ink-foreground/70">Conheça nosso trabalho, nossa estrutura e a dedicação que colocamos em cada espetáculo.</p>
           </div>
           <div data-reveal className="reveal fx-drag" style={delay(160)}>
-            <div className="relative mt-10 aspect-video overflow-hidden rounded-2xl border border-ink-foreground/10 bg-ink">
-              {playing ? (
-                <video src={heroVideo.url} controls autoPlay playsInline className="h-full w-full object-cover" />
-              ) : (
-                <>
-                  <img src={palcoTeatro} alt="" loading="lazy" width={1280} height={864} className="h-full w-full object-cover opacity-60" />
-                  <button type="button" onClick={() => setPlaying(true)} aria-label="Assistir ao vídeo institucional" className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-primary shadow-glow"><Play className="ml-1 h-9 w-9 text-primary-foreground" /></span>
-                  </button>
-                </>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => setPlaying((v) => !v)}
+              aria-label={playing ? "Pausar o vídeo" : "Reproduzir o vídeo"}
+              className="relative mt-10 block aspect-video w-full overflow-hidden rounded-2xl border border-ink-foreground/10 bg-ink"
+            >
+              <video
+                ref={sectionRef}
+                src={heroVideo.url}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                aria-hidden
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                className="h-full w-full object-cover"
+              />
+              <span className={`absolute inset-0 flex items-center justify-center bg-ink/45 transition-opacity duration-300 ${playing ? "opacity-0" : "opacity-100"}`}>
+                <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-primary shadow-glow"><Play className="ml-1 h-9 w-9 text-primary-foreground" /></span>
+              </span>
+            </button>
           </div>
-          <button type="button" onClick={() => setPlaying(true)} className="mt-8 inline-block rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow">ASSISTA AO VÍDEO</button>
+          <button type="button" onClick={() => setPlaying((v) => !v)} className="mt-8 inline-block rounded-full bg-gradient-primary px-7 py-3.5 font-bold text-primary-foreground shadow-glow">
+            {playing ? "PAUSAR O VÍDEO" : "ASSISTA AO VÍDEO"}
+          </button>
         </div>
       </section>
 
