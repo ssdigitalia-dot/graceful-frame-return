@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { ArrowUp, Mic, Headphones, SlidersHorizontal, Disc3, Lightbulb, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays } from "lucide-react";
 import logo from "@/assets/amorim-logo.png.asset.json";
 import studio from "@/assets/studio-about.jpg";
+import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -75,7 +76,18 @@ function Index() {
 
       {/* Hero: full-bleed media to the very top, no text over it */}
       <section id="topo" className="relative h-screen min-h-[560px] w-full overflow-hidden bg-ink">
-        <img src={studio} alt="" width={1280} height={960} className="absolute inset-0 h-full w-full object-cover animate-slow-zoom" />
+        <video src={heroVideo.url} poster={studio} autoPlay muted loop playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-ink/25" />
+        <div aria-hidden className="absolute inset-x-0 bottom-24 flex items-end justify-center gap-1.5 opacity-70">
+          {Array.from({ length: 28 }).map((_, i) => (
+            <span key={i} className="eq-bar w-1 rounded-full bg-gradient-primary" style={{ animationDelay: `${(i * 137) % 1000}ms`, animationDuration: `${900 + ((i * 53) % 700)}ms` }} />
+          ))}
+        </div>
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          {["♪", "♫", "♩", "♬", "♪", "♫"].map((n, i) => (
+            <span key={i} className="music-note absolute text-2xl text-primary" style={{ left: `${10 + i * 15}%`, animationDelay: `${i * 1.7}s` }}>{n}</span>
+          ))}
+        </div>
         <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-ink/80 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
       </section>
