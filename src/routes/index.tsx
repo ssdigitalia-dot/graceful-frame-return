@@ -375,7 +375,7 @@ function Index() {
       <section id="contato" className="mx-auto max-w-4xl px-5 py-24 text-center">
         <h2 data-reveal className="reveal text-3xl font-extrabold md:text-4xl">VAMOS SUBIR NESSE <span className="text-gradient-primary">PALCO JUNTOS?</span></h2>
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {[[MessageCircle, "WhatsApp", "(00) 00000-0000"], [Phone, "Telefone", "(00) 0000-0000"], [Mail, "E-mail", "contato@amorim.com.br"], [Instagram, "Instagram", "@amorimproducoes"]].map(([I, l, v], i) => {
+          {[[MessageCircle, "WhatsApp", "(11) 95303-8954"], [Phone, "Telefone", "(11) 95303-8954"], [Mail, "E-mail", "contato@amorim.com.br"], [Instagram, "Instagram", "@amorimproducoes"]].map(([I, l, v], i) => {
             const Icon = I as typeof Phone;
             return (
               <div key={l as string} data-reveal className="reveal flex items-center gap-4 rounded-2xl border bg-card p-5 text-left" style={delay(i * 80)}>
