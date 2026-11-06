@@ -116,6 +116,22 @@
 }
 @utility music-note { bottom: 8%; opacity: 0; animation: float-note 10s linear infinite; }
 
+@keyframes speaker-wave {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+@keyframes speaker-thump {
+  0%, 100% { transform: scale(1); }
+  20% { transform: scale(1.08); }
+  40% { transform: scale(0.97); }
+}
+.speaker-wave { animation: speaker-wave 1.5s ease-out infinite; }
+.speaker-cone { animation: speaker-thump 0.75s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .speaker-wave, .speaker-cone { animation: none; }
+  .speaker-wave { opacity: 0; }
+}
+
 /* ===== Scroll physics: motion that follows the speed of the scroll ===== */
 
 /* Light version: only cheap GPU transforms, no blur/skew/per-frame filters */

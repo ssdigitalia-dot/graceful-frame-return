@@ -3,7 +3,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
-import { ArrowUp, Mic, Speaker, Ticket, Users, Building2, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays, MapPin } from "lucide-react";
+import { ArrowUp, Mic, Speaker, Ticket, Users, Building2, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays, MapPin, SlidersVertical, Drama, Trophy, DoorOpen, Volume2, Projector } from "lucide-react";
 const logo = { url: "/amorim-logo.png" };
 import palcoShow from "@/assets/palco-show.jpg";
 import publicoShow from "@/assets/publico-show.jpg";
@@ -37,6 +37,15 @@ const nav = [
   ["Agenda", "#agenda"],
   ["Galeria", "#galeria"],
   ["Contato", "#contato"],
+];
+
+const sonorizacao = [
+  { icon: SlidersVertical, t: "Projeto e instalação de sistemas de som de chamadas e música para as atividades escolares." },
+  { icon: Drama, t: "Sonorização de escolas, teatros e anfiteatros." },
+  { icon: Trophy, t: "Sonorização de quadras poliesportivas." },
+  { icon: DoorOpen, t: "Sonorização da área de portaria, entrada e saída de alunos." },
+  { icon: Volume2, t: "Criação de sistema volante de som para ensaios, apresentações e festas." },
+  { icon: Projector, t: "Instalação de projetores e telas de projeção." },
 ];
 
 const services = [
@@ -270,6 +279,44 @@ function Index() {
               <a href="#agenda" className="mt-5 inline-block text-sm font-bold text-primary">Solicitar informações →</a>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Sonorização de ambientes */}
+      <section id="sonorizacao" className="relative overflow-hidden bg-ink py-24 text-ink-foreground">
+        <div className="pointer-events-none absolute -left-32 top-10 h-80 w-80 rounded-full bg-primary/20 blur-3xl" />
+        <div className="relative mx-auto max-w-6xl px-5">
+          <div data-reveal className="reveal text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Serviços</p>
+            <h2 className="mt-3 text-3xl font-extrabold md:text-4xl">SONORIZAÇÃO DE AMBIENTES</h2>
+          </div>
+          <div className="mt-12 flex items-end justify-center gap-6 md:gap-16">
+            {[0, 1, 2].map((s) => (
+              <div key={s} className={`relative flex flex-col items-center gap-3 rounded-2xl border border-ink-foreground/15 bg-ink-foreground/5 px-4 py-5 ${s === 1 ? "md:scale-125" : ""}`}>
+                {[0, 1].map((c) => (
+                  <div key={c} className="relative flex items-center justify-center">
+                    {[0, 1, 2].map((w) => (
+                      <span key={w} className="speaker-wave absolute h-16 w-16 rounded-full border-2 border-primary" style={{ animationDelay: `${w * 0.5 + s * 0.2}s` }} />
+                    ))}
+                    <div className="speaker-cone flex h-16 w-16 items-center justify-center rounded-full border-4 border-ink-foreground/30 bg-ink" style={{ animationDelay: `${s * 0.15}s` }}>
+                      <div className="h-6 w-6 rounded-full bg-gradient-primary shadow-glow" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="mt-16 grid gap-4 md:grid-cols-2">
+            {sonorizacao.map(({ icon: I, t }, i) => (
+              <div key={t} data-reveal className="reveal flex items-center gap-4 rounded-2xl border border-ink-foreground/15 bg-ink-foreground/5 p-5 transition-all hover:border-primary hover:shadow-glow" style={delay(i * 80)}>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground"><I className="h-6 w-6" /></div>
+                <p className="border-l-2 border-primary pl-4 text-sm md:text-base">{t}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center">
+            <a href="#agenda" className="inline-block rounded-full bg-gradient-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-glow">SOLICITAR ORÇAMENTO</a>
+          </div>
         </div>
       </section>
 
