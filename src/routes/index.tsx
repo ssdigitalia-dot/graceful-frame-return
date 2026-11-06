@@ -1,9 +1,9 @@
 // ============= Full file contents =============
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { ArrowUp, Mic, Speaker, Ticket, Users, Building2, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays, MapPin } from "lucide-react";
-import logo from "@/assets/amorim-logo.png.asset.json";
+const logo = { url: "/amorim-logo.png" };
 import palcoShow from "@/assets/palco-show.jpg";
 import publicoShow from "@/assets/publico-show.jpg";
 import palcoTeatro from "@/assets/palco-teatro.jpg";
@@ -149,6 +149,7 @@ function Index() {
             {nav.map(([l, h]) => (
               <a key={h} href={h} className="text-sm font-semibold text-ink-foreground/85 transition-colors hover:text-primary">{l}</a>
             ))}
+            <Link to="/portfolio" className="text-sm font-semibold text-ink-foreground/85 transition-colors hover:text-primary">Portfólio artístico</Link>
             <a href="#agenda" className="rounded-full bg-gradient-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow">Agende</a>
           </nav>
         </div>
@@ -398,6 +399,7 @@ function Index() {
             <p className="font-display font-bold tracking-wide">AMORIM CONSULTORIA E PRODUÇÕES</p>
             <nav className="flex flex-wrap justify-center gap-5 text-sm text-ink-foreground/70 md:justify-end">
               {nav.map(([l, h]) => <a key={h} href={h} className="hover:text-primary">{l}</a>)}
+              <Link to="/portfolio" className="hover:text-primary">Portfólio artístico</Link>
               <a href="#" className="hover:text-primary">Política de Privacidade</a>
             </nav>
             <p className="text-xs text-ink-foreground/50">© {new Date().getFullYear()} Amorim Consultoria e Produções. Todos os direitos reservados.</p>
