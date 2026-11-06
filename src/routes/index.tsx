@@ -1,6 +1,7 @@
 // ============= Full file contents =============
 
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { ArrowUp, Mic, Speaker, Ticket, Users, Building2, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays, MapPin } from "lucide-react";
 const logo = { url: "/amorim-logo.png" };
@@ -9,6 +10,7 @@ import publicoShow from "@/assets/publico-show.jpg";
 import palcoTeatro from "@/assets/palco-teatro.jpg";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { useReveal, useScrollPhysics } from "@/hooks/useScrollPhysics";
+import { enviarSolicitacaoAgenda } from "@/lib/agenda.functions";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -67,6 +69,8 @@ function Index() {
   const [showTop, setShowTop] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
   const [date, setDate] = useState<Date | undefined>();
   const [heroReady, setHeroReady] = useState(false);
   const [playing, setPlaying] = useState(true);
@@ -119,9 +123,37 @@ function Index() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const submit = (e: FormEvent) => {
+  const enviar = useServerFn(enviarSolicitacaoAgenda);
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSent(true);
+    if (!date) return;
+    const f = new FormData(e.currentTarget);
+    const get = (n: string) => String(f.get(n) ?? "");
+    setSending(true);
+    setErro(null);
+    try {
+      await enviar({
+        data: {
+          nome: get("nome"),
+          telefone: get("telefone"),
+          tipoProducao: get("tipoProducao"),
+          localDesejado: get("localDesejado"),
+          horario: get("horario"),
+          dataShow: format(date, "yyyy-MM-dd"),
+          mensagem: get("mensagem"),
+        },
+      });
+      setSent(true);
+    } catch (err) {
+      setErro(
+        err instanceof Error && err.message
+          ? err.message
+          : "Não foi possível enviar sua solicitação. Tente novamente.",
+      );
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -318,7 +350,7 @@ function Index() {
             <p className="mt-2 text-ink-foreground/70">Obrigado! Vamos analisar a disponibilidade para {date ? format(date, "dd 'de' MMMM", { locale: ptBR }) : "sua data"} e entraremos em contato.</p>
           </div>
         ) : (
-          <form onSubmit={(e) => { if (!date) { e.preventDefault(); return; } submit(e); }} data-reveal className="reveal mt-12 grid gap-8 rounded-3xl border border-primary/40 bg-ink-foreground/5 p-6 shadow-glow md:grid-cols-[auto_1fr] md:p-8" style={delay(120)}>
+          <form onSubmit={submit} data-reveal className="reveal mt-12 grid gap-8 rounded-3xl border border-primary/40 bg-ink-foreground/5 p-6 shadow-glow md:grid-cols-[auto_1fr] md:p-8" style={delay(120)}>
             <div className="mx-auto rounded-2xl border border-ink-foreground/10 bg-ink p-2">
               <Calendar
                 mode="single"
@@ -333,25 +365,26 @@ function Index() {
               </p>
             </div>
             <div className="grid content-start gap-4 sm:grid-cols-2">
-              <input required placeholder="Nome" className={field} />
-              <input required placeholder="Telefone / WhatsApp" className={field} />
-              <select required defaultValue="" className={`${field} sm:col-span-2`}>
+              <input required name="nome" placeholder="Nome" className={field} />
+              <input required name="telefone" placeholder="Telefone / WhatsApp" className={field} />
+              <select required name="tipoProducao" defaultValue="" className={`${field} sm:col-span-2`}>
                 <option value="" disabled>Tipo de produção</option>
                 {services.map((s) => <option key={s.t} className="text-foreground">{s.t}</option>)}
               </select>
-              <select required defaultValue="" className={`${field} sm:col-span-2`}>
+              <select required name="localDesejado" defaultValue="" className={`${field} sm:col-span-2`}>
                 <option value="" disabled>Local desejado</option>
                 {venues.map((v) => <option key={v} className="text-foreground">{v}</option>)}
                 <option className="text-foreground">Outro local</option>
               </select>
-              <select required defaultValue="" className={`${field} sm:col-span-2`}>
+              <select required name="horario" defaultValue="" className={`${field} sm:col-span-2`}>
                 <option value="" disabled>Horário</option>
                 {["09:00", "11:00", "14:00", "16:00", "19:00", "21:00"].map((h) => <option key={h} className="text-foreground">{h}</option>)}
               </select>
-              <textarea rows={4} placeholder="Conte sobre o seu show" className={`${field} sm:col-span-2`} />
-              <button disabled={!date} className="rounded-full bg-gradient-primary px-7 py-4 font-bold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-50 sm:col-span-2">
-                {date ? "SOLICITAR AGENDAMENTO" : "ESCOLHA UMA DATA NO CALENDÁRIO"}
+              <textarea rows={4} name="mensagem" placeholder="Conte sobre o seu show" className={`${field} sm:col-span-2`} />
+              <button disabled={!date || sending} className="rounded-full bg-gradient-primary px-7 py-4 font-bold text-primary-foreground shadow-glow transition-transform hover:-translate-y-0.5 disabled:opacity-50 sm:col-span-2">
+                {sending ? "ENVIANDO..." : date ? "SOLICITAR AGENDAMENTO" : "ESCOLHA UMA DATA NO CALENDÁRIO"}
               </button>
+              {erro && <p role="alert" className="text-sm font-semibold text-primary sm:col-span-2">{erro}</p>}
             </div>
           </form>
         )}
