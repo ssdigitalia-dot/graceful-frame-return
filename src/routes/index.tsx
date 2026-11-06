@@ -1,7 +1,6 @@
 // ============= Full file contents =============
 
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { ArrowUp, Mic, Speaker, Ticket, Users, Building2, Sparkles, Phone, Mail, Instagram, MessageCircle, Play, CalendarDays, MapPin, SlidersVertical, Drama, Trophy, DoorOpen, Volume2, Projector } from "lucide-react";
 const logo = { url: "/amorim-logo.png" };
@@ -10,7 +9,8 @@ import publicoShow from "@/assets/publico-show.jpg";
 import palcoTeatro from "@/assets/palco-teatro.jpg";
 import heroVideo from "@/assets/studio-hero.mp4.asset.json";
 import { useReveal, useScrollPhysics } from "@/hooks/useScrollPhysics";
-import { enviarSolicitacaoAgenda } from "@/lib/agenda.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { validateAgenda } from "@/lib/agenda-validation";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -132,8 +132,6 @@ function Index() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const enviar = useServerFn(enviarSolicitacaoAgenda);
-
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!date) return;
@@ -142,17 +140,17 @@ function Index() {
     setSending(true);
     setErro(null);
     try {
-      await enviar({
-        data: {
-          nome: get("nome"),
-          telefone: get("telefone"),
-          tipoProducao: get("tipoProducao"),
-          localDesejado: get("localDesejado"),
-          horario: get("horario"),
-          dataShow: format(date, "yyyy-MM-dd"),
-          mensagem: get("mensagem"),
-        },
+      const row = validateAgenda({
+        nome: get("nome"),
+        telefone: get("telefone"),
+        tipoProducao: get("tipoProducao"),
+        localDesejado: get("localDesejado"),
+        horario: get("horario"),
+        dataShow: format(date, "yyyy-MM-dd"),
+        mensagem: get("mensagem"),
       });
+      const { error } = await supabase.from("agenda_requests").insert(row);
+      if (error) throw new Error("Não foi possível enviar sua solicitação. Tente novamente.");
       setSent(true);
     } catch (err) {
       setErro(

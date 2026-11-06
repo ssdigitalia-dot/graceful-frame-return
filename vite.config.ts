@@ -11,5 +11,8 @@ export default defineConfig({
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
+    // Public pages are also emitted as plain HTML for traditional FTP hosting.
+    pages: [{ path: "/" }, { path: "/portfolio" }],
+    prerender: { enabled: true, autoStaticPathsDiscovery: false },
   },
 });
